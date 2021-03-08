@@ -105,4 +105,6 @@ See bikeCard for this module.
 
 ### Handle Events in Lightning Web Components
 
+See bikeCard for this module.
+
 ### Add Styles and Data to a Lightning Web Component
