@@ -6,20 +6,20 @@
 
 Example:
 
-```
+```HTML
 <template>
     <input value={message}></input>
 </template>
 ```
 
-```
+```JavaScript
 import { LightningElement } from 'lwc';
 export default class App extends LightningElement {
   message = 'Hello World';
 }
 ```
 
-```
+```CSS
 input {
    color: blue;
 }
