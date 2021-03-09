@@ -107,4 +107,51 @@ export default class LdsCreateRecord extends LightningElement {
 
 ### Use Apex to Work with Data
 
+Example AccountController.cls:
+```Java
+public with sharing class AccountController {
+    @AuraEnabled(cacheable=true)
+    public static List<Contact> getRelatedContacts(Id accountId) {
+        return [
+            SELECT Name, Title, Email, Phone
+            FROM Contact
+            WHERE AccountId = :accountId
+            WITH SECURITY_ENFORCED
+       ];
+    }
+}
+```
+*When a method is cacheable, newly added or changed versions of records may not be returned until the cache is refreshed. 
+
+Example wireApexProperty.js:
+```JavaScript
+import { LightningElement, api, wire } from 'lwc';
+import getRelatedContacts from '@salesforce/apex/AccountController.getRelatedContacts';
+export default class WireApexProperty extends LightningElement {
+    @api recordId;
+    @wire(getRelatedContacts, { accountId: '$recordId' })
+    contacts;
+}
+```
+
+Example callApexImperative.js:
+```JavaScript
+import { LightningElement, api, wire } from 'lwc';
+import getRelatedContacts from '@salesforce/apex/AccountController.getRelatedContacts';
+export default class CallApexImperative extends LightningElement {
+    @api recordId;
+    handleButtonClick() {
+        getRelatedContacts({ //imperative Apex call
+            accountId: '$recordId'
+        })
+            .then(contacts => {
+                //code to execute if related contacts are returned successfully
+            })
+            .catch(error => {
+                //code to execute if related contacts are not returned successfully
+            });
+    }
+}
+```
+
 ### Handle Server Errors
