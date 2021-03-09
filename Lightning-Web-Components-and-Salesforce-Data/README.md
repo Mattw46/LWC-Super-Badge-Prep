@@ -155,3 +155,76 @@ export default class CallApexImperative extends LightningElement {
 ```
 
 ### Handle Server Errors
+
+Example: Handle errors in HTML:
+```HTML
+<template>
+    <template if:true={errors}>
+        <p>{errors}</p>
+    </template>
+</template>
+```
+
+How the error is handled depends on how you interact with Salesforce Data.
+
+#### Handling Errors on Wired Properties
+
+wireApexProperty.js
+```JavaScript
+import { LightningElement, api, wire } from 'lwc';
+import { reduceErrors } from 'c/ldsUtils';
+import getRelatedContacts from '@salesforce/apex/AccountController.getRelatedContacts';
+export default class WireApexProperty extends LightningElement {
+    @api recordId;
+    @wire(getRelatedContacts, { accountId: '$recordId' })
+    contacts;
+    get errors() {
+        return (this.contacts.error) ?
+            reduceErrors(this.contacts.error) : [];
+    }
+}
+```
+
+#### Handling Errors on Wired Functions
+
+wireApexFunction.js
+```JavaScript
+import { LightningElement, api, wire } from 'lwc';
+import { reduceErrors } from 'c/ldsUtils';
+import getRelatedContacts from '@salesforce/apex/AccountController.getRelatedContacts';
+export default class WireApexFunction extends LightningElement {
+    @api recordId;
+    errors;
+    @wire(getRelatedContacts, { accountId: '$recordId' })
+    wiredContacts({data, error}) {
+        if (error)
+            this.errors = reduceErrors(error);
+    }
+}
+```
+
+#### Handling Errors When Calling a Function Imperatively
+
+callApexImperative.js
+```JavaScript
+import { LightningElement, api, wire } from 'lwc';
+import { reduceErrors } from 'c/ldsUtils';
+import getRelatedContacts from '@salesforce/apex/AccountController.getRelatedContacts';
+export default class CallApexImperative extends LightningElement {
+    @api recordId;
+    errors;
+    handleButtonClick() {
+        getRelatedContacts({
+            accountId: '$recordId'
+        })
+            .then(contacts => {
+                // code to execute if the promise is resolved
+            })
+            .catch(error => {
+                this.errors = reduceErrors(error); // code to execute if the promise is rejected
+            });
+    }
+}
+```
+
+*AccountList from previous is modified in the module.
